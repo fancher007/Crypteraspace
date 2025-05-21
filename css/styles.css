@@ -1,0 +1,67 @@
+/*body {*/
+/*  background-color: #f8f9fa;*/
+/*}*/
+
+.card {
+  border: none;
+  border-radius: 15px;
+}
+
+.card-header {
+  border-top-left-radius: 15px !important;
+  border-top-right-radius: 15px !important;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.bg-prim {
+    background-color: #E32057;
+}
+
+.table th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  color: #212529;
+  border-top: none;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+.wallet-name {
+  font-weight: 600;
+  color: #198754;
+}
+
+.burned {
+  color: #dc3545;
+  font-weight: 500;
+}
+
+.hash {
+  font-family: "Roboto Mono", monospace;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.time {
+  color: #198754;
+  font-weight: 500;
+}
+
+@media (max-width: 576px) {
+  .table {
+    font-size: 0.9rem;
+  }
+}
+
+.icon-dashboard {
+  font-size: 2.5rem;
+  color: #4fc3f7; /* Light blue for visibility on dark backgrounds */
+  display: block;
+  margin-bottom: 0.5rem;
+}

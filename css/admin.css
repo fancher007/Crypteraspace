@@ -1,0 +1,189 @@
+/* Admin styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+:root {
+  --bg-color: #1f2937;
+  --text-color: #e5e7eb;
+  --primary-color: #3b82f6;
+  --secondary-color: #6366f1;
+  --success-color: #10b981;
+  --danger-color: #ef4444;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  min-height: 100vh;
+}
+
+.container {
+  background-color: #374151;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+}
+
+.dashboard {
+  max-width: 1200px;
+  margin: 2rem auto;
+}
+
+h2 {
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+input, button {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+input {
+  background-color: #4b5563;
+  color: var(--text-color);
+}
+
+button {
+  background-color: var(--primary-color);
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: var(--secondary-color);
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.error {
+  background-color: var(--danger-color);
+  color: white;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.success {
+  background-color: var(--success-color);
+  color: white;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+th, td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #4b5563;
+}
+
+th {
+  background-color: var(--secondary-color);
+}
+
+.empty-state {
+  text-align: center;
+  color: #9ca3af;
+  padding: 2rem;
+}
+
+.btn-logout {
+  display: inline-block;
+  background-color: var(--danger-color);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  margin-top: 1rem;
+  width: auto;
+}
+
+.btn-logout:hover {
+  background-color: #dc2626;
+  text-decoration: none;
+}
+
+.copyable {
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.3s;
+}
+
+.copyable:hover {
+  background-color: #4b5563;
+}
+
+.copyable::after {
+  content: '📋';
+  font-size: 0.8rem;
+  margin-left: 0.5rem;
+  opacity: 0.7;
+}
+
+.tooltip {
+  visibility: hidden;
+  width: 100px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 4px;
+  padding: 8px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -50px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 0.8rem;
+}
+
+.copyable:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.copyable.copied {
+  background-color: var(--success-color) !important;
+  color: white;
+}
+
+.copyable.copied::after {
+  content: '✔️';
+}
+
+.copyable.copied .tooltip {
+  background-color: var(--success-color);
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 600px) {
+  .container { padding: 1rem; }
+  th, td { padding: 8px 4px; font-size: 0.9rem; }
+}
