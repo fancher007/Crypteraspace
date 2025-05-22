@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
-    <link rel="icon" href="../static/images/flarelogo.png">
+    <link rel="icon" href="../images/favicon.png">
     <link rel="stylesheet" href="../css/admin.css">
     
     <!-- Firebase SDK -->
@@ -16,10 +16,26 @@
     <div class="container">
         <h2>Admin Login</h2>
         <div id="errorMessage" class="error" style="display: none;"></div>
+        <div id="successMessage" class="success" style="display: none;"></div>
+        
+        <!-- Login Form -->
         <form id="loginForm">
             <input type="email" id="email" name="email" placeholder="Email" required>
             <input type="password" id="password" name="password" placeholder="Password" required>
             <button type="submit">Login</button>
+            <p class="forgot-password">
+                <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+            </p>
+        </form>
+
+        <!-- Reset Password Form -->
+        <form id="resetPasswordForm" style="display: none;">
+            <h3>Reset Password</h3>
+            <input type="email" id="resetEmail" name="resetEmail" placeholder="Enter your email" required>
+            <button type="submit">Send Reset Link</button>
+            <p class="back-to-login">
+                <a href="#" id="backToLoginLink">Back to Login</a>
+            </p>
         </form>
     </div>
     
@@ -28,8 +44,31 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const loginForm = document.getElementById('loginForm');
+            const resetPasswordForm = document.getElementById('resetPasswordForm');
             const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+            const backToLoginLink = document.getElementById('backToLoginLink');
             
+            // Show reset password form
+            forgotPasswordLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                loginForm.style.display = 'none';
+                resetPasswordForm.style.display = 'block';
+                errorMessage.style.display = 'none';
+                successMessage.style.display = 'none';
+            });
+
+            // Show login form
+            backToLoginLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                resetPasswordForm.style.display = 'none';
+                loginForm.style.display = 'block';
+                errorMessage.style.display = 'none';
+                successMessage.style.display = 'none';
+            });
+            
+            // Handle login
             loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
@@ -58,10 +97,48 @@
                     showError('Invalid email or password.');
                 }
             });
+
+            // Handle password reset
+            resetPasswordForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('resetEmail').value;
+                
+                try {
+                    // First check if the email exists in users collection with admin role
+                    const usersRef = firebase.firestore().collection('users');
+                    const querySnapshot = await usersRef.where('email', '==', email).where('role', '==', 'admin').get();
+                    
+                    if (querySnapshot.empty) {
+                        showError('This email is not registered as an admin account.');
+                        return;
+                    }
+
+                    // If email is found as admin, send reset link
+                    await firebase.auth().sendPasswordResetEmail(email);
+                    showSuccess('Password reset link sent to your email.');
+                    // Clear the form
+                    resetPasswordForm.reset();
+                } catch (error) {
+                    console.error('Reset password error:', error);
+                    if (error.code === 'auth/user-not-found') {
+                        showError('This email is not registered as an admin account.');
+                    } else {
+                        showError('Error sending reset link. Please try again.');
+                    }
+                }
+            });
             
             function showError(message) {
                 errorMessage.textContent = message;
                 errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+            }
+
+            function showSuccess(message) {
+                successMessage.textContent = message;
+                successMessage.style.display = 'block';
+                errorMessage.style.display = 'none';
             }
         });
     </script>
